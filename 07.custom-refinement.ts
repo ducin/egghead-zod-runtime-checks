@@ -2,9 +2,28 @@ import { z } from "zod";
 
 const roomBookingSchema = z.object({
   roomType: z.string(),
-  dueDate: z.string().date(),
+  dueDate: z.string().refine(
+    (dateStr) => {
+      return !isNaN(Date.parse(dateStr));
+      //   new Date(dateStr).getDay() != 3;
+    },
+    {
+      message: "Date shouldn't be Wednesday",
+    }
+  ),
   numberOfGuests: z.number().min(1).max(4),
-  price: z.number().positive(),
+  price: z
+    .number()
+    .positive()
+    .refine(
+      (value) => {
+        return Number.isInteger(value * 100);
+      },
+      {
+        message:
+          "Price must have at most two decimal places",
+      }
+    ),
 });
 
 // Example usage
